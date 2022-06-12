@@ -126,7 +126,7 @@ public interface ElasticsearchTemplate<T extends BaseEsEntity, M> {
      * @return
      * @throws BizException
      */
-    Long countTotal(QueryBuilder builder, Class<T> clazz) throws BizException;
+    Long countTotal(/* QueryBuilder */ SearchSourceBuilder builder, Class<T> clazz) throws BizException;
 
     /**
      * 根据查询条件查询,查询指定分页范围的数据集,不包含分页信息

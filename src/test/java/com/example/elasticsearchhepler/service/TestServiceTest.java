@@ -122,30 +122,31 @@ public class TestServiceTest {
 
     @Test
     void deleteByQuery() throws BizException {
-        QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name","张三5");
+        //QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name","张三3");
+        QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name.keyword","张三3");
         System.out.println(testIndexAutoService.deleteByQuery(queryBuilder));
     }
 
     @Test
     void getById() throws BizException {
-        System.out.println(testIndexAutoService.getById("cff1k34Brx3CyPdycAwb"));
+        System.out.println(testIndexAutoService.getById("xu9cU4EBdzENKYyukd7y"));
     }
 
     @Test
     void mGetById() throws BizException {
-        System.out.println(testIndexAutoService.mGetById(Arrays.asList("cff1k34Brx3CyPdycAwb","3")));
+        System.out.println(testIndexAutoService.mGetById(Arrays.asList("xu9cU4EBdzENKYyukd7y","dO9bU4EBdzENKYyuMd5w")));
     }
 
     @Test
     void exists() throws BizException {
-        System.out.println(testIndexAutoService.exists("cff1k34Brx3CyPdycAwb"));
+        System.out.println(testIndexAutoService.exists("5"));
     }
 
     @Test
     void updateById() throws BizException {
 
         TestIndexAutoEntity entity = new TestIndexAutoEntity();
-        entity.setId("cff1k34Brx3CyPdycAwb");
+        entity.setId("3");
         entity.setUserName("张三3");
         entity.setUserTitle("");
         entity.setWeight(53.2F);
@@ -159,7 +160,8 @@ public class TestServiceTest {
 
     @Test
     void updateByQuery() throws BizException {
-        QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name","张三3");
+        //QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name","张三3");
+        QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name.keyword","张三3");
         Map<String,Object> map = new HashMap<>();
         map.put("user_age",31);
         map.put("user_title","这是title");
@@ -169,7 +171,8 @@ public class TestServiceTest {
     @Test
     void searchOrigin() throws BizException {
         SearchSourceBuilder queryBuilder = new SearchSourceBuilder();
-        QueryBuilder query = QueryBuilders.termQuery("user_name","张三3");
+        //QueryBuilder query = QueryBuilders.termQuery("user_name","张三3");
+        QueryBuilder query = QueryBuilders.termQuery("user_name.keyword","张三3");
         queryBuilder.query(query);
         queryBuilder.size(10);
         queryBuilder.from(0);
@@ -178,14 +181,17 @@ public class TestServiceTest {
 
     @Test
     void countTotal() throws BizException {
-        QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name","张三3");
-        System.out.println(testIndexAutoService.countTotal(queryBuilder));
+        //QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name","张三3");
+        QueryBuilder queryBuilder = QueryBuilders.termsQuery("user_name.keyword","张三3");
+        SearchSourceBuilder searchSourceBuilder = SearchSourceBuilder.searchSource().query(queryBuilder);
+        System.out.println(testIndexAutoService.countTotal(searchSourceBuilder));
     }
 
     @Test
     void searchList() throws BizException {
         SearchSourceBuilder queryBuilder = new SearchSourceBuilder();
-        QueryBuilder query = QueryBuilders.termQuery("user_name","张三3");
+        //QueryBuilder query = QueryBuilders.termQuery("user_name","张三3");
+        QueryBuilder query = QueryBuilders.termQuery("user_name.keyword","张三3");
         queryBuilder.query(query);
         queryBuilder.size(10);
         queryBuilder.from(0);
@@ -195,14 +201,14 @@ public class TestServiceTest {
     @Test
     void searchPage() throws BizException {
         SearchSourceBuilder queryBuilder = new SearchSourceBuilder();
-        QueryBuilder query = QueryBuilders.termQuery("user_name","张三3");
+        //QueryBuilder query = QueryBuilders.termQuery("user_name","张三3");
+        QueryBuilder query = QueryBuilders.termQuery("user_name.keyword","张三3");
         queryBuilder.query(query);
         queryBuilder.size(10);
         queryBuilder.from(0);
-        queryBuilder.sort("user_name", SortOrder.DESC);
+        queryBuilder.sort("user_score", SortOrder.DESC);
         System.out.println(testIndexAutoService.searchPage(queryBuilder,1,10));
     }
-
 
     @Test
     void completionSuggest() throws BizException {
@@ -211,17 +217,17 @@ public class TestServiceTest {
 
     @Test
     void completionSearchAsYouType() throws BizException {
-        System.out.println(testIndexAutoService.completionSearchAsYouType("user_title","北大"));
+        System.out.println(testIndexAutoService.completionSearchAsYouType("user_title","北京"));
     }
 
     @Test
     void scroll() throws BizException {
 
         SearchSourceBuilder queryBuilder = new SearchSourceBuilder();
-        QueryBuilder query = QueryBuilders.matchQuery("user_title","北京");
+        QueryBuilder query = QueryBuilders.matchQuery("user_title","天安门");
         queryBuilder.query(query);
         queryBuilder.size(1);
-        queryBuilder.sort("user_name", SortOrder.DESC);
+        queryBuilder.sort("user_score", SortOrder.DESC);
         Map<String, Object> map = testIndexAutoService.scroll(queryBuilder, "");
         System.out.println(JSON.toJSONString(map));
         while (EmptyUtil.isNotEmpty(map) && EmptyUtil.isNotEmpty(map.getOrDefault("result",""))){

@@ -152,7 +152,7 @@ public class TestIndexAutoServiceImpl implements TestIndexAutoService {
      * @throws BizException
      */
     @Override
-    public Long countTotal(QueryBuilder builder) throws BizException {
+    public Long countTotal(/* QueryBuilder */ SearchSourceBuilder builder) throws BizException {
         return elasticsearchTemplate.countTotal(builder, TestIndexAutoEntity.class);
     }
 

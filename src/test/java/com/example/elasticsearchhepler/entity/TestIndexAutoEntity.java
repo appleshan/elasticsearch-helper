@@ -114,4 +114,18 @@ public class TestIndexAutoEntity extends BaseEsEntity implements Serializable {
     public void setBirthDate(LocalDateTime birthDate) {
         this.birthDate = birthDate;
     }
+
+    @Override
+    public String toString() {
+        return "TestIndexAutoEntity{" +
+                "userName='" + userName + '\'' +
+                ", userTitle='" + userTitle + '\'' +
+                ", userScore=" + userScore +
+                ", weight=" + weight +
+                ", studyFlag=" + studyFlag +
+                ", userAge=" + userAge +
+                ", runDistance=" + runDistance +
+                ", birthDate=" + birthDate +
+                '}';
+    }
 }

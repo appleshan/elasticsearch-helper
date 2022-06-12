@@ -94,7 +94,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         if (EmptyUtil.isEmpty(t)) {
             return false;
         }
-        IndexRequest request = new IndexRequest(elasticSearchHelpUtils.getIndexName(t));
+        IndexRequest request = new IndexRequest(elasticSearchHelpUtils.getIndexName(t), "_doc");
         request.id(t.getId());
         request.source(JSON.toJSONString(elasticSearchHelpUtils.objectToMap(t)), XContentType.JSON);
         try {
@@ -127,7 +127,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         }
         BulkRequest request = new BulkRequest();
         for (T t : paramList) {
-            request.add(new IndexRequest(elasticSearchHelpUtils.getIndexName(t))
+            request.add(new IndexRequest(elasticSearchHelpUtils.getIndexName(t), "_doc")
                     .id(t.getId()).source(JSON.toJSONString(elasticSearchHelpUtils.objectToMap(t)), XContentType.JSON));
         }
         try {
@@ -153,7 +153,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         if (EmptyUtil.isEmpty(id)) {
             return false;
         }
-        DeleteRequest deleteRequest = new DeleteRequest(elasticSearchHelpUtils.getIndexName(clazz), id.toString());
+        DeleteRequest deleteRequest = new DeleteRequest(elasticSearchHelpUtils.getIndexName(clazz), "_doc", id.toString());
         try {
             DeleteResponse deleteResponse = client.delete(deleteRequest, RequestOptions.DEFAULT);
             if (EmptyUtil.isEmpty(deleteResponse)) {
@@ -178,7 +178,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         }
         BulkRequest bulkRequest = new BulkRequest();
         for (M id : ids) {
-            bulkRequest.add(new DeleteRequest(elasticSearchHelpUtils.getIndexName(clazz), id.toString()));
+            bulkRequest.add(new DeleteRequest(elasticSearchHelpUtils.getIndexName(clazz), "_doc", id.toString()));
         }
         try {
             BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
@@ -226,7 +226,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         if (EmptyUtil.isEmpty(id)) {
             return null;
         }
-        GetRequest getRequest = new GetRequest(elasticSearchHelpUtils.getIndexName(clazz), id.toString());
+        GetRequest getRequest = new GetRequest(elasticSearchHelpUtils.getIndexName(clazz), "_doc", id.toString());
         try {
             GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
             if (EmptyUtil.isEmpty(getResponse) || !getResponse.isExists()) {
@@ -248,7 +248,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         }
         MultiGetRequest request = new MultiGetRequest();
         for (M m : ids) {
-            request.add(new MultiGetRequest.Item(elasticSearchHelpUtils.getIndexName(clazz), m.toString()));
+            request.add(new MultiGetRequest.Item(elasticSearchHelpUtils.getIndexName(clazz), "_doc", m.toString()));
         }
 
         try {
@@ -278,7 +278,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         if (EmptyUtil.isEmpty(id)) {
             return false;
         }
-        GetRequest getRequest = new GetRequest(elasticSearchHelpUtils.getIndexName(clazz), id.toString());
+        GetRequest getRequest = new GetRequest(elasticSearchHelpUtils.getIndexName(clazz), "_doc", id.toString());
         try {
             return client.exists(getRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -299,7 +299,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         if (EmptyUtil.isEmpty(t) || EmptyUtil.isEmpty(t.getId())) {
             return false;
         }
-        UpdateRequest updateRequest = new UpdateRequest(elasticSearchHelpUtils.getIndexName(t), t.getId());
+        UpdateRequest updateRequest = new UpdateRequest(elasticSearchHelpUtils.getIndexName(t), "_doc", t.getId());
         updateRequest.doc(JSON.toJSONString(elasticSearchHelpUtils.objectToMap(t)), XContentType.JSON);
         try {
             UpdateResponse updateResponse = client.update(updateRequest, RequestOptions.DEFAULT);
@@ -381,7 +381,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
      * @return
      */
     @Override
-    public Long countTotal(QueryBuilder builder, Class<T> clazz) throws BizException {
+    public Long countTotal(/* QueryBuilder */ SearchSourceBuilder builder, Class<T> clazz) throws BizException {
         try {
             CountRequest countRequest = new CountRequest(new String[]{elasticSearchHelpUtils.getIndexName(clazz)},
                     builder);
@@ -455,8 +455,8 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
             pageInfo.setList(list);
             pageInfo.setPageNum(pageNo);
             pageInfo.setPageSize(pageSize);
-            pageInfo.setTotal(hits.getTotalHits().value);
-            pageInfo.setPages(elasticSearchHelpUtils.getTotalPages(hits.getTotalHits().value, pageSize));
+            pageInfo.setTotal(hits.getTotalHits());
+            pageInfo.setPages(elasticSearchHelpUtils.getTotalPages(hits.getTotalHits(), pageSize));
             return pageInfo;
         } catch (IOException e) {
             logger.error("根据查询条件查询结果出错 出错原因：", e);
@@ -510,7 +510,7 @@ public class ElasticsearchTemplateImpl<T extends BaseEsEntity, M> implements Ela
         String[] fields = new String[]{fieldName + ".search_as_you_type", fieldName + ".search_as_you_type._2gram",
                 fieldName + ".search_as_you_type._3gram"};
         QueryBuilder queryBuilder =
-                QueryBuilders.multiMatchQuery(fieldValue, fields).operator(Operator.AND).type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
+                QueryBuilders.multiMatchQuery(fieldValue, fields).operator(Operator.AND).type(MultiMatchQueryBuilder.Type.BEST_FIELDS);
         searchSourceBuilder.query(queryBuilder);
         searchSourceBuilder.size(COMPLETION_SUGGESTION_SIZE);
 

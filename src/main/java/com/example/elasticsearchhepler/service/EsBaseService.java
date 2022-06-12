@@ -39,6 +39,7 @@ public interface EsBaseService<T> {
      *
      * @param id
      * @return
+     * @throws BizException
      */
     boolean deleteById(String id) throws BizException;
 
@@ -47,6 +48,7 @@ public interface EsBaseService<T> {
      *
      * @param ids
      * @return
+     * @throws BizException
      */
     List<BulkResponseResult> deleteByIds(List<String> ids) throws BizException;
 
@@ -64,6 +66,7 @@ public interface EsBaseService<T> {
      *
      * @param id 主键
      * @return
+     * @throws BizException
      */
     T getById(String id) throws BizException;
 
@@ -72,6 +75,7 @@ public interface EsBaseService<T> {
      *
      * @param ids 主键集合
      * @return
+     * @throws BizException
      */
     List<T> mGetById(List<String> ids) throws BizException;
 
@@ -80,6 +84,7 @@ public interface EsBaseService<T> {
      *
      * @param id
      * @return
+     * @throws BizException
      */
     boolean exists(String id) throws BizException;
 
@@ -88,6 +93,7 @@ public interface EsBaseService<T> {
      *
      * @param t
      * @return
+     * @throws BizException
      */
     boolean updateById(T t) throws BizException;
 
@@ -97,7 +103,7 @@ public interface EsBaseService<T> {
      * @param queryBuilder 查询参数
      * @param updateParams 更新参数(如果有多个条件、条件之间是并且关系)
      * @return 修改条数
-     * @throws Exception
+     * @throws BizException
      */
     Long updateByQuery(QueryBuilder queryBuilder, Map<String, Object> updateParams) throws BizException;
 
@@ -106,7 +112,7 @@ public interface EsBaseService<T> {
      *
      * @param builder
      * @return
-     * @throws Exception
+     * @throws BizException
      */
     SearchResponse searchOrigin(SearchSourceBuilder builder) throws BizException;
 
@@ -117,14 +123,14 @@ public interface EsBaseService<T> {
      * @return
      * @throws BizException
      */
-    Long countTotal(QueryBuilder builder) throws BizException;
+    Long countTotal(/* QueryBuilder */ SearchSourceBuilder builder) throws BizException;
 
     /**
      * 根据查询条件查询，查询指定分页范围的数据集,不包含分页信息
      *
      * @param queryBuilder
      * @return
-     * @throws Exception
+     * @throws BizException
      */
     List<T> searchList(SearchSourceBuilder queryBuilder) throws BizException;
 
@@ -133,7 +139,7 @@ public interface EsBaseService<T> {
      *
      * @param queryBuilder
      * @return
-     * @throws Exception
+     * @throws BizException
      */
     PageInfo<T> searchPage(SearchSourceBuilder queryBuilder, int pageNo, int pageSize) throws BizException;
 
@@ -163,7 +169,7 @@ public interface EsBaseService<T> {
      * @param fieldName
      * @param fieldValue
      * @return
-     * @throws Exception
+     * @throws BizException
      */
     List<String> completionSuggest(String fieldName, String fieldValue) throws BizException;
 
@@ -191,7 +197,7 @@ public interface EsBaseService<T> {
      * @param fieldName
      * @param fieldValue
      * @return
-     * @throws Exception
+     * @throws BizException
      */
     List<String> completionSearchAsYouType(String fieldName, String fieldValue) throws BizException;
 
@@ -202,7 +208,7 @@ public interface EsBaseService<T> {
      *
      * @param queryBuilder
      * @return
-     * @throws Exception
+     * @throws BizException
      */
     Map<String, Object> scroll(SearchSourceBuilder queryBuilder, String scrollId) throws BizException;
 
@@ -214,8 +220,7 @@ public interface EsBaseService<T> {
      * @param queryBuilder
      * @param time         查询上下文有效时间 设置合理满足查询数据的时间即可,单位是分钟
      * @return
-     * @throws Exception
+     * @throws BizException
      */
     Map<String, Object> scroll(SearchSourceBuilder queryBuilder, String scrollId, long time) throws BizException;
 }
-
